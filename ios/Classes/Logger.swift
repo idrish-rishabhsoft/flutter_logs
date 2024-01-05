@@ -114,8 +114,8 @@ public class Logger {
     }
     
     public func addOutput(_ output: Output) {
-        if (!outputs.contains(where: {type(of: $0) == type(of: output)})) {
-        outputs.append(output)
+        if (!outputs.contains(where: {isOutputEqual($0, comparedTo: output)})) {
+            outputs.append(output)
         }
     }
     
@@ -124,4 +124,33 @@ public class Logger {
             out.process(string)
         }
     }
+    
+    public func logToFileAndConsoleOnly(_ filePath: String, _ log: String) {
+        for out in outputs {
+            if(out is ConsoleOutput) {
+                out.process(log)
+            }
+            else if(out is FileOutput) {
+                let fileOutput = out as! FileOutput
+                let isTargettedFile = fileOutput.filePath == filePath
+                if(isTargettedFile) {
+                    out.process(log)
+                }
+            }
+        }
+    }
+
+    func isOutputEqual(_ existingOutput: Output, comparedTo newOutput: Output) -> Bool {
+        //If types are different then no need to check for equality
+        guard type(of: existingOutput) == type(of: newOutput) else { return false }
+
+        //FileOutput are compared by filePath
+        if let fileOutput = newOutput as? FileOutput, let paramFileOutput = existingOutput as? FileOutput {
+            return fileOutput.filePath == paramFileOutput.filePath
+        }
+
+        return true
+    }
+
+    
 }

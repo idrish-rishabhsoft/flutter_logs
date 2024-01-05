@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
         ],
         timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
         directoryStructure: DirectoryStructure.FOR_DATE,
-        logTypesEnabled: [_myLogFileName],
+        logTypesEnabled: ["network", "device"],
         logFileExtension: LogFileExtension.LOG,
         logsWriteDirectoryName: "MyLogs",
         logsExportDirectoryName: "MyLogs/Exported",
@@ -268,7 +268,15 @@ class _MyAppState extends State<MyApp> {
     var logMessage =
         "This is a log message: ${DateTime.now().millisecondsSinceEpoch}, it will be saved to my log file named: \'$_myLogFileName\'";
     FlutterLogs.logToFile(
-        logFileName: _myLogFileName,
+        logFileName: "network",
+        overwrite: false,
+        //If set 'true' logger will append instead of overwriting
+        logMessage: logMessage,
+        appendTimeStamp: true); //Add time stamp at the end of log message
+    setLogsStatus(status: logMessage);
+
+    FlutterLogs.logToFile(
+        logFileName: "device",
         overwrite: false,
         //If set 'true' logger will append instead of overwriting
         logMessage: logMessage,

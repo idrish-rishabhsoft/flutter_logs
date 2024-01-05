@@ -38,7 +38,7 @@ class LogHelper: NSObject {
         let fileURL = dirURL.appendingPathComponent(fileName).appendingPathExtension("txt")
         let output = FileOutput(filePath: fileURL.path)
         Logger.sharedInstance.addOutput(output)
-        Logger.sharedInstance.log(prefix() + ": " + log)
+        Logger.sharedInstance.logToFileAndConsoleOnly(fileURL.path, prefix() + ": " + message)
         result(log)
     }
     
