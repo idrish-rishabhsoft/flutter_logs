@@ -31,6 +31,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
     companion object {
         private val TAG = "FlutterLogsPlugin"
         private var channel: MethodChannel? = null
+        private var senderChannel: MethodChannel? = null
         private var event_channel: EventChannel? = null
 
         @JvmStatic
@@ -41,13 +42,14 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
 
         @JvmStatic
         private fun setUpPluginMethods(context: Context, messenger: BinaryMessenger) {
-          
+
             channel = MethodChannel(messenger, "flutter_logs")
+            senderChannel = MethodChannel(messenger, "flutter_logs_native_to_flutter")
 
             channel?.setMethodCallHandler { call, result ->
                 when (call.method) {
                     "initLogs" -> {
-
+                        listenEventNewEventLogFileCreated();    
                         val logLevelsEnabled = getLogLevelsById("logLevelsEnabled", call)
                         val logTypesEnabled = getListOfStringById("logTypesEnabled", call)
                         val logsRetentionPeriodInDays = getIntValueById("logsRetentionPeriodInDays", call)
@@ -219,8 +221,6 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                         } else {
                             LogsHelper.writeLogToFile(logFileName, logMessage, appendTimeStamp)
                         }
-
-                        listenEventNewEventLogFileCreated()
                     }
                     "exportLogs" -> {
                         val exportType = getStringValueById("exportType", call)
@@ -363,9 +363,11 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                             "PLogs Path: ${it.event}",
                             LogLevel.INFO
                         )
-
                         if (it.event == EventTypes.NEW_EVENT_LOG_FILE_CREATED) {
-                            channel?.invokeMethod("fileCreated", "${it.data}")
+                            val arguments = HashMap<String, Any>().apply {
+                                put("fileName", it.data)
+                            }
+                            senderChannel?.invokeMethod("onFileCreated", arguments)
                         }
                     },
                     onError = {
