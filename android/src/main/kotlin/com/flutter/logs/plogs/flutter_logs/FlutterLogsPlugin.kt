@@ -367,6 +367,7 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                             val arguments = HashMap<String, Any>().apply {
                                 put("fileName", it.data)
                             }
+                            Log.i("", "File created event received and sending to Dart")
                             senderChannel?.invokeMethod("onFileCreated", arguments)
                         }
                     },

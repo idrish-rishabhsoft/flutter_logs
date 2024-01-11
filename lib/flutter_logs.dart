@@ -52,6 +52,9 @@ class FlutterLogs {
 
   static const MethodChannel channel = const MethodChannel('flutter_logs');
 
+  static const MethodChannel receiverChannel =
+      const MethodChannel('flutter_logs_native_to_flutter');
+
   static Future<String> initLogs(
       {List<LogLevel>? logLevelsEnabled,
       List<String>? logTypesEnabled,
@@ -109,6 +112,11 @@ class FlutterLogs {
       'enabled': enabled,
     });
     printDebugMessage(result, 2);
+
+    receiverChannel.setMethodCallHandler((call) async {
+      print(call.method);
+    });
+
     return result;
   }
 
