@@ -5,7 +5,10 @@ import android.content.Context
 import android.util.Log
 import androidx.annotation.NonNull
 import com.blackbox.plog.pLogs.PLog
+import com.blackbox.plog.pLogs.events.EventTypes
+import com.blackbox.plog.pLogs.events.LogEvents
 import com.blackbox.plog.pLogs.models.LogLevel
+import com.blackbox.plog.utils.RxBus
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -216,6 +219,8 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                         } else {
                             LogsHelper.writeLogToFile(logFileName, logMessage, appendTimeStamp)
                         }
+
+                        listenEventNewEventLogFileCreated()
                     }
                     "exportLogs" -> {
                         val exportType = getStringValueById("exportType", call)
@@ -338,6 +343,43 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
 
                 }
             })
+        }
+
+        private fun listenEventNewEventLogFileCreated() {
+            RxBus.listen(LogEvents::class.java)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        PLog.logThis(
+                            TAG,
+                            "exportPLogs",
+                            "PLogs Path: ${it.data}",
+                            LogLevel.INFO
+                        )
+                        PLog.logThis(
+                            TAG,
+                            "exportPLogs",
+                            "PLogs Path: ${it.event}",
+                            LogLevel.INFO
+                        )
+
+                        if (it.event == EventTypes.NEW_EVENT_LOG_FILE_CREATED) {
+                            channel?.invokeMethod("fileCreated", "${it.data}")
+                        }
+                    },
+                    onError = {
+                        it.printStackTrace()
+                        PLog.logThis(
+                            TAG,
+                            "exportPLogs",
+                            "PLog Error: " + it.message,
+                            LogLevel.ERROR
+                        )
+                        //channel?.invokeMethod("logToFile", it.message)
+                    },
+                    onComplete = { }
+                )
         }
         
     }

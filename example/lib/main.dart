@@ -65,6 +65,10 @@ class _MyAppState extends State<MyApp> {
 
         setLogsStatus(
             status: "logsPrinted: ${call.arguments.toString()}", append: true);
+      } else if (call.method == 'fileCreated') {
+        print("File Created Called");
+        FlutterLogs.logInfo(
+            _tag, "setUpLogs", "logsPrinted: ${call.arguments.toString()}");
       }
     });
   }
