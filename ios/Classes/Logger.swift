@@ -29,12 +29,15 @@ public struct ConsoleOutput: Output {
 
 public class FileOutput: Output {
     var filePath: String
+    var deviceInfo: DeviceInfo?
     private var fileHandle: FileHandle?
     private var queue: DispatchQueue
     
-    public init(filePath: String) {
+    public init(filePath: String, deviceInfo: DeviceInfo?) {
         self.filePath = filePath
+        self.deviceInfo = deviceInfo
         self.queue = DispatchQueue(label: "File output")
+        print(filePath)
     }
     
     deinit {
@@ -56,10 +59,20 @@ public class FileOutput: Output {
     
     
     private func getFileHandle() -> FileHandle? {
+        var isFileCreated = false
         if !FileManager.default.fileExists(atPath: filePath) {
             FileManager.default.createFile(atPath: filePath, contents: nil, attributes: nil)
+            isFileCreated = true
         }
         let fileHandle = FileHandle(forWritingAtPath: filePath)
+        //If file is created then write some common logs in header of file.
+        if isFileCreated && deviceInfo != nil {
+            let printed = "**************\n \(deviceInfo?.description ?? "") \n ************** \n"
+            if let data = printed.data(using: String.Encoding.utf8) {
+                fileHandle?.seekToEndOfFile()
+                fileHandle?.write(data)
+            }
+        }
         return fileHandle
     }
 }

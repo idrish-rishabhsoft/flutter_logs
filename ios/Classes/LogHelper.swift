@@ -18,9 +18,20 @@ class LogHelper: NSObject {
         return ""
     }
     
-    static func initLogs(result: @escaping FlutterResult){
+    static var deviceInfo: DeviceInfo?
+    
+    static func initLogs(call: FlutterMethodCall, result: @escaping FlutterResult){
         print("initLogs")
-        
+        if let infoDict = call.arguments as? Dictionary<String,Any> {
+            let result = infoDict["deviceInfo"]
+            print(result)
+            if let deviceInfoDict = infoDict["deviceInfo"] as? Dictionary<String,String> {
+                print("Got device info")
+                deviceInfo = DeviceInfo(osVersion: deviceInfoDict["osVersion"] ?? "",
+                                        appVersion: deviceInfoDict["appVersion"] ?? "",
+                                        deviceModel: deviceInfoDict["deviceModel"] ?? "")
+            }
+        }
     }
     
     static func logToFile(result: @escaping FlutterResult, logFileName:String, message:String,
@@ -36,7 +47,7 @@ class LogHelper: NSObject {
         
         let fileName = "\(logFileName)-\(dateFormatter.string(from: Date()))"
         let fileURL = dirURL.appendingPathComponent(fileName).appendingPathExtension("txt")
-        let output = FileOutput(filePath: fileURL.path)
+        let output = FileOutput(filePath: fileURL.path, deviceInfo: deviceInfo)
         Logger.sharedInstance.addOutput(output)
         Logger.sharedInstance.logToFileAndConsoleOnly(fileURL.path, prefix() + ": " + message)
         result(log)
@@ -58,7 +69,7 @@ class LogHelper: NSObject {
         
         let fileName = "Log-\(dateFormatter.string(from: Date()))"
         let fileURL = dirURL.appendingPathComponent(fileName).appendingPathExtension("txt")
-        let output = FileOutput(filePath: fileURL.path)
+        let output = FileOutput(filePath: fileURL.path, deviceInfo: deviceInfo)
         Logger.sharedInstance.addOutput(output)
         Logger.sharedInstance.log(prefix() + ": " + log)
         result(log)
@@ -80,7 +91,7 @@ class LogHelper: NSObject {
         
         let fileName = "Log-\(dateFormatter.string(from: Date()))"
         let fileURL = dirURL.appendingPathComponent(fileName).appendingPathExtension("txt")
-        let output = FileOutput(filePath: fileURL.path)
+        let output = FileOutput(filePath: fileURL.path, deviceInfo: deviceInfo)
         Logger.sharedInstance.addOutput(output)
         Logger.sharedInstance.log(prefix() + ": " + log)
         result(log)

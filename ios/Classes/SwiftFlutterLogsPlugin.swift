@@ -32,7 +32,7 @@ public class SwiftFlutterLogsPlugin: NSObject, FlutterPlugin {
         
         
         if call.method == "initLogs" {
-            LogHelper.initLogs(result:result)
+            LogHelper.initLogs(call: call, result:result)
             result("Logs Configuration added.")
         }else if call.method == "logThis" {
             guard let args = call.arguments else {
