@@ -31,7 +31,6 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
     companion object {
         private val TAG = "FlutterLogsPlugin"
         private var channel: MethodChannel? = null
-        private var senderChannel: MethodChannel? = null
         private var event_channel: EventChannel? = null
 
         @JvmStatic
@@ -40,15 +39,17 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
         @JvmStatic
         private var binaryMessenger: BinaryMessenger? = null
 
+        private var deviceInfo: DeviceInfo? = null
+
         @JvmStatic
         private fun setUpPluginMethods(context: Context, messenger: BinaryMessenger) {
 
             channel = MethodChannel(messenger, "flutter_logs")
-            senderChannel = MethodChannel(messenger, "flutter_logs_native_to_flutter")
 
             channel?.setMethodCallHandler { call, result ->
                 when (call.method) {
                     "initLogs" -> {
+                        Log.i("", "Init log call from Native")
                         listenEventNewEventLogFileCreated();    
                         val logLevelsEnabled = getLogLevelsById("logLevelsEnabled", call)
                         val logTypesEnabled = getListOfStringById("logTypesEnabled", call)
@@ -73,6 +74,11 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                         val exportPath = getStringValueById("exportPath", call)
                         val singleLogFileSize = getIntValueById("singleLogFileSize", call)
                         val enabled = getBoolValueById("enabled", call)
+
+                        val deviceInfoMap = call.argument<HashMap<String, String>>("deviceInfo")
+                        deviceInfoMap?.let { map ->
+                            deviceInfo = DeviceInfo(osVersion = map["osVersion"] ?: "", appVersion = map["appVersion"] ?: "", deviceModel = map["deviceModel"] ?: "")
+                        }
 
                         LogsHelper.setUpLogger(
                                 context = context,
@@ -364,11 +370,14 @@ class FlutterLogsPlugin : FlutterPlugin, ActivityAware {
                             LogLevel.INFO
                         )
                         if (it.event == EventTypes.NEW_EVENT_LOG_FILE_CREATED) {
-                            val arguments = HashMap<String, Any>().apply {
-                                put("fileName", it.data)
+                            deviceInfo?.let { _ ->
+                                Log.i("", "Device info is present. about to log")
+                                val nameWithoutExt = it.data.substringBeforeLast(".")
+                                LogsHelper.writeLogToFile(nameWithoutExt, "\n*****************", false)
+                                LogsHelper.writeLogToFile(nameWithoutExt, deviceInfo.toString(), false)
+                                LogsHelper.writeLogToFile(nameWithoutExt, "\n*****************", false)
                             }
-                            Log.i("", "File created event received and sending to Dart")
-                            senderChannel?.invokeMethod("onFileCreated", arguments)
+
                         }
                     },
                     onError = {

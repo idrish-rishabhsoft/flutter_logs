@@ -55,30 +55,32 @@ class FlutterLogs {
   static const MethodChannel receiverChannel =
       const MethodChannel('flutter_logs_native_to_flutter');
 
-  static Future<String> initLogs(
-      {List<LogLevel>? logLevelsEnabled,
-      List<String>? logTypesEnabled,
-      int logsRetentionPeriodInDays = 14,
-      int zipsRetentionPeriodInDays = 3,
-      bool autoDeleteZipOnExport = false,
-      bool autoClearLogs = true,
-      bool autoExportErrors = true,
-      bool encryptionEnabled = false,
-      String encryptionKey = "",
-      required DirectoryStructure directoryStructure,
-      bool logSystemCrashes = true,
-      bool isDebuggable = true,
-      bool debugFileOperations = true,
-      bool attachTimeStamp = true,
-      bool attachNoOfFiles = true,
-      required TimeStampFormat timeStampFormat,
-      required LogFileExtension logFileExtension,
-      bool zipFilesOnly = false,
-      String logsWriteDirectoryName = "",
-      String logsExportZipFileName = "",
-      String logsExportDirectoryName = "",
-      int singleLogFileSize = 2,
-      bool enabled = true}) async {
+  static Future<String> initLogs({
+    List<LogLevel>? logLevelsEnabled,
+    List<String>? logTypesEnabled,
+    int logsRetentionPeriodInDays = 14,
+    int zipsRetentionPeriodInDays = 3,
+    bool autoDeleteZipOnExport = false,
+    bool autoClearLogs = true,
+    bool autoExportErrors = true,
+    bool encryptionEnabled = false,
+    String encryptionKey = "",
+    required DirectoryStructure directoryStructure,
+    bool logSystemCrashes = true,
+    bool isDebuggable = true,
+    bool debugFileOperations = true,
+    bool attachTimeStamp = true,
+    bool attachNoOfFiles = true,
+    required TimeStampFormat timeStampFormat,
+    required LogFileExtension logFileExtension,
+    bool zipFilesOnly = false,
+    String logsWriteDirectoryName = "",
+    String logsExportZipFileName = "",
+    String logsExportDirectoryName = "",
+    int singleLogFileSize = 2,
+    bool enabled = true,
+    Map<String, String>? deviceInfo,
+  }) async {
     var directoryStructureString = _getDirectoryStructure(directoryStructure);
     var timeStampFormatString = _getTimeStampFormat(timeStampFormat);
     var logFileExtensionString = _getLogFileExtension(logFileExtension);
@@ -110,12 +112,9 @@ class FlutterLogs {
       'exportPath': logsExportDirectoryName,
       'singleLogFileSize': singleLogFileSize,
       'enabled': enabled,
+      'deviceInfo': deviceInfo,
     });
     printDebugMessage(result, 2);
-
-    receiverChannel.setMethodCallHandler((call) async {
-      print(call.method);
-    });
 
     return result;
   }
