@@ -20,11 +20,10 @@ class LogHelper: NSObject {
     
     static var deviceInfo: DeviceInfo?
     
-    static func initLogs(call: FlutterMethodCall, result: @escaping FlutterResult){
-        print("initLogs")
+    static func initLogs(call: FlutterMethodCall, result: @escaping FlutterResult){        
         if let infoDict = call.arguments as? Dictionary<String,Any> {
             let result = infoDict["deviceInfo"]
-            print(result)
+            //print(result)
             if let deviceInfoDict = infoDict["deviceInfo"] as? Dictionary<String,String> {
                 print("Got device info")
                 deviceInfo = DeviceInfo(osVersion: deviceInfoDict["osVersion"] ?? "",

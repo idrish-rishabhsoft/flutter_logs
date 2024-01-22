@@ -1,3 +1,6 @@
+## 2.1.11+6
+* On creation of file it is adding header like device and OS info.
+
 ## 2.1.10
 * Set min sdkVersion to 16
 

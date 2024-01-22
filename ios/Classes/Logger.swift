@@ -37,7 +37,7 @@ public class FileOutput: Output {
         self.filePath = filePath
         self.deviceInfo = deviceInfo
         self.queue = DispatchQueue(label: "File output")
-        print(filePath)
+        //print(filePath)
     }
     
     deinit {
