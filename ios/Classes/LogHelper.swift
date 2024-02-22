@@ -42,7 +42,7 @@ class LogHelper: NSObject {
             return
         }
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "y-MM"
+        dateFormatter.dateFormat = "dd-MM-y"
         
         let fileName = "\(logFileName)-\(dateFormatter.string(from: Date()))"
         let fileURL = dirURL.appendingPathComponent(fileName).appendingPathExtension("txt")
