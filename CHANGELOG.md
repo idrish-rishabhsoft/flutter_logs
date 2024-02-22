@@ -1,3 +1,7 @@
+## 2.1.11+7
+* Updated file name date format of iOS
+* Added new line after each log while writing to file.
+
 ## 2.1.11+6
 * On creation of file it is adding header like device and OS info.
 
