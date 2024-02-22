@@ -84,10 +84,10 @@ object LogsHelper {
         try {
             if (appendTimeStamp) {
                 PLog.getLoggerFor(type)
-                        ?.appendToFile("$data [${DateTimeUtils.getTimeFormatted()}]")
+                        ?.appendToFile("[${DateTimeUtils.getTimeFormatted()}] $data \n")
             } else {
                 PLog.getLoggerFor(type)
-                        ?.appendToFile("$data")
+                        ?.appendToFile("$data \n")
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -98,9 +98,9 @@ object LogsHelper {
 
         try {
             if (appendTimeStamp) {
-                PLog.getLoggerFor(type)?.overwriteToFile("$data [${DateTimeUtils.getTimeFormatted()}]")
+                PLog.getLoggerFor(type)?.overwriteToFile("[${DateTimeUtils.getTimeFormatted()}] $data \n")
             } else {
-                PLog.getLoggerFor(type)?.overwriteToFile(data!!)
+                PLog.getLoggerFor(type)?.overwriteToFile("$data!! \n")
             }
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
